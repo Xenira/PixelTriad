@@ -8,7 +8,10 @@ using System.Text;
 
 namespace Assets.Scripts.Networking.Modules
 {
-    abstract class TcpModule<T> where T : class, new()
+    abstract class TcpModule<Base, In, Out>
+        where Base : TcpModule<Base, In, Out>, new()
+        where In : class, new()
+        where Out : class, new()
     {
         private static CyclingByte id = new CyclingByte();
         private static MiniMessagePacker packer = new MiniMessagePacker();
@@ -16,43 +19,62 @@ namespace Assets.Scripts.Networking.Modules
         private Dictionary<byte, MessageCallback> callbacks = new Dictionary<byte, MessageCallback>();
         private TcpSender sender;
 
-        internal delegate void MessageCallback(bool success, Message<T> data);
+        internal delegate void MessageCallback(bool success, Message<Out> data);
 
-        public TcpModule(TcpListener listener, TcpSender sender)
+        private static Base _instance;
+        internal static Base Instance
         {
-            this.sender = sender;
-            listener.OnMessageRecived += Listener_OnMessageRecived;
+            get
+            {
+                if (_instance == null)
+                {
+                    _instance = new Base();
+                }
+                return _instance;
+            }
+        }
+
+        public TcpModule()
+        {
+            sender = TcpConnection.sender;
+            TcpConnection.listener.OnMessageRecived += Listener_OnMessageRecived;
         }
 
         private void Listener_OnMessageRecived(Message message)
         {
-            if (typeof(T) is IDictionary<string, object>)
+            if (typeof(In) is IDictionary<string, object>)
             {
-                OnMessage(message as Message<T>);
+                OnMessage(message as Message<Out>);
                 return;
             }
 
-            var parsedMessage = new Message<T>
+            var parsedMessage = new Message<Out>
             {
                 id = message.id,
                 cmd = message.cmd,
-                data = DictionarySerializer.ToObject<T>(message.data)
+                data = message.data.ToObject<Out>()
             };
 
             OnMessage(parsedMessage);
         }
 
-        protected virtual void OnMessage(Message<T> message) { }
+        protected virtual void OnMessage(Message<Out> message)
+        {
+            if (message.id.HasValue && callbacks.ContainsKey(message.id.Value))
+            {
+                callbacks[message.id.Value](true, message);
+            }
+        }
 
-        internal void SendMessage(T data) {
-            sender.SendMessage(packer.Pack(new Message<T>()
+        internal void SendMessage(In data) {
+            sender.SendMessage(packer.Pack(DictionarySerializer.AsDictionary(new Message<In>()
             {
                 cmd = 0,
                 data = data
-            }));
+            })));
         }
 
-        internal void SendMessage(T data, MessageCallback callback)
+        internal void SendMessage(In data, MessageCallback callback)
         {
             var packageId = id.GetNext();
             if (callbacks.ContainsKey(packageId))
@@ -61,17 +83,19 @@ namespace Assets.Scripts.Networking.Modules
             }
             callbacks.Add(packageId, callback);
 
-            sender.SendMessage(packer.Pack(new Message<T>()
+            sender.SendMessage(packer.Pack(DictionarySerializer.AsDictionary(new Message<In>()
             {
                 id = packageId,
                 cmd = 0,
                 data = data
-            }));
+            })));
         }
     }
 
-    abstract class TcpModule : TcpModule<Dictionary<string, object>>
-    {
-        public TcpModule(TcpListener listener, TcpSender sender) : base(listener, sender) { }
-    }
+    abstract class TcpModule<Base, In> : TcpModule<Base, In, Dictionary<string, object>>
+        where In : class, new()
+        where Base : TcpModule<Base, In, Dictionary<string, object>>, new() { }
+
+    abstract class TcpModule<Base> : TcpModule<Base, Dictionary<string, object>, Dictionary<string, object>>
+        where Base : TcpModule<Base, Dictionary<string, object>, Dictionary<string, object>>, new() { }
 }

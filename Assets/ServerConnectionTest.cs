@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Assets.Scripts.Networking.Modules.Login;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -31,6 +32,14 @@ public class ServerConnectionTest : MonoBehaviour
         var connector = GetComponent<TcpConnection>();
         connector.StartClient(serverUrl.text, Convert.ToInt32(serverPort.text));
         //ServerConnection.OpenSocket(serverUrl.text);
+    }
+
+    public void Login()
+    {
+        LoginModule.Instance.Login("lasse.sprengel@gmail.com", "abcdef", (success, user) =>
+        {
+            Log(success ? null : "failed to authenticate", JsonUtility.ToJson(user));
+        });
     }
 
     private void Connector_OnConnected(object sender, object data)

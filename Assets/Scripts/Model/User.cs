@@ -10,7 +10,7 @@ namespace Assets.Scripts.Model
         public string name;
         public string email;
         public string picture;
-        public int elo;
-        public Deck[] decks = new Deck[5];
+        public int elo { get; set; }
+        public int exp { get; set; }
     }
 }

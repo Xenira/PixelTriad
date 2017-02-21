@@ -7,9 +7,10 @@ using UnityEngine;
 
 public class TcpConnection : MonoBehaviour {
 
-    private TcpClient client;
-    private SslStream stream;
-    private TcpSender sender;
+    internal static TcpClient client;
+    internal static SslStream stream;
+    internal static Assets.Scripts.Networking.TcpListener listener;
+    internal static TcpSender sender;
 
     internal void StartClient(string address, int port)
     {
@@ -21,8 +22,8 @@ public class TcpConnection : MonoBehaviour {
 
     private void Connector_OnConnected(TcpClient client, SslStream stream)
     {
-        this.client = client;
-        this.stream = stream;
+        TcpConnection.client = client;
+        TcpConnection.stream = stream;
         StartListening();
         PrepareSending();
     }
@@ -30,12 +31,13 @@ public class TcpConnection : MonoBehaviour {
     internal void PrepareSending()
     {
         sender = new TcpSender(stream);
+        sender.Start();
         StartCoroutine(sender.WaitFor());
     }
 
     internal void StartListening()
     {
-        var listener = new Assets.Scripts.Networking.TcpListener(stream);
+        listener = new Assets.Scripts.Networking.TcpListener(stream);
         listener.OnMessageRecived += Listener_OnMessageRecived;
         listener.Start();
         StartCoroutine(listener.WaitFor());

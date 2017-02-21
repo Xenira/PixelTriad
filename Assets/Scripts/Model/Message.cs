@@ -8,14 +8,15 @@ using UnityEngine;
 
 namespace Assets.Scripts.Model
 {
+    [Serialize]
     class Message<T> where T : class, new()
     {
-        public int? id { get; set; }
+        public byte? id { get; set; }
         public int cmd { get; set; }
         public T data { get; set; }
     }
 
-    [Serializable]
+    [Serialize]
     sealed class Message : Message<Dictionary<string, object>> { }
 
     class MessageSerializer
@@ -25,7 +26,7 @@ namespace Assets.Scripts.Model
             Debug.Log(data["cmd"].GetType().ToString());
             if (!data.ContainsKey("cmd") || !(data["cmd"] is long) || !data.ContainsKey("data")) { return null; }
 
-            var id = data.ContainsKey("id") && data["id"] is int ? (int)data["id"] : (int?)null;
+            var id = data.ContainsKey("id") && data["id"] is byte ? (byte)data["id"] : (byte?)null;
             var cmd = Convert.ToInt32(data["cmd"]);
             var d = (Dictionary<string, object>)data["data"];
 
