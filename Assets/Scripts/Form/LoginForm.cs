@@ -16,17 +16,17 @@ public class LoginForm : MonoBehaviour
     public void Login()
     {
         btnLogin.enabled = false;
-        ServerConnection.Login(this, tbEmail.text, tbPassword.text, (error, session) =>
-        {
-            btnLogin.enabled = true;
-            if (error != null)
-            {
-                lblError.text = error;
-            }
-            else
-            {
-                FindObjectOfType<LevelManager>().LoadLevel("Start");
-            }
-        });
+        //ServerConnection.Login(this, tbEmail.text, tbPassword.text, (error, session) =>
+        //{
+        //    btnLogin.enabled = true;
+        //    if (error != null)
+        //    {
+        //        lblError.text = error;
+        //    }
+        //    else
+        //    {
+        //        FindObjectOfType<LevelManager>().LoadLevel("Start");
+        //    }
+        //});
     }
 }

@@ -11,23 +11,23 @@ public class FindGameForm : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-        if (ServerConnection.session == null)
-        {
-            FindObjectOfType<LevelManager>().LoadLevel("Login");
-            return;
-        }
-        ServerConnection.FindGame(this, (error, data) =>
-        {
-            if (error != null)
-            {
-                FindObjectOfType<LevelManager>().LoadLevel("Start");
-                return;
-            }
-            if (data != null)
-            {
+        //if (ServerConnection.session == null)
+        //{
+        //    FindObjectOfType<LevelManager>().LoadLevel("Login");
+        //    return;
+        //}
+        //ServerConnection.FindGame(this, (error, data) =>
+        //{
+        //    if (error != null)
+        //    {
+        //        FindObjectOfType<LevelManager>().LoadLevel("Start");
+        //        return;
+        //    }
+        //    if (data != null)
+        //    {
 
-            }
-        });
+        //    }
+        //});
     }
 	
 	// Update is called once per frame
@@ -37,15 +37,15 @@ public class FindGameForm : MonoBehaviour {
 
     public void CancelQueue()
     {
-        ServerConnection.CancelQueue(this, (error, data) =>
-        {
-            if (error != null)
-            {
-                Debug.LogError(error);
-            }
+        //ServerConnection.CancelQueue(this, (error, data) =>
+        //{
+        //    if (error != null)
+        //    {
+        //        Debug.LogError(error);
+        //    }
 
-            FindObjectOfType<LevelManager>().LoadLevel("Start");
+        //    FindObjectOfType<LevelManager>().LoadLevel("Start");
 
-        });
+        //});
     }
 }

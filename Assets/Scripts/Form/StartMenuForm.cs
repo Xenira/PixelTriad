@@ -9,11 +9,11 @@ public class StartMenuForm : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-        if (ServerConnection.session == null)
-        {
-            FindObjectOfType<LevelManager>().LoadLevel("Login");
-            return;
-        }
-        usernameLabel.text = ServerConnection.session.user.name;
+        //if (ServerConnection.session == null)
+        //{
+        //    FindObjectOfType<LevelManager>().LoadLevel("Login");
+        //    return;
+        //}
+        //usernameLabel.text = ServerConnection.session.user.name;
 	}
 }
