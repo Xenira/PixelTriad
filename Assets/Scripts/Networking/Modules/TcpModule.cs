@@ -14,11 +14,13 @@ namespace Assets.Scripts.Networking.Modules
         private static MiniMessagePacker packer = new MiniMessagePacker();
 
         private Dictionary<byte, MessageCallback> callbacks = new Dictionary<byte, MessageCallback>();
+        private TcpSender sender;
 
         internal delegate void MessageCallback(bool success, Message<T> data);
 
-        public TcpModule(TcpListener listener)
+        public TcpModule(TcpListener listener, TcpSender sender)
         {
+            this.sender = sender;
             listener.OnMessageRecived += Listener_OnMessageRecived;
         }
 
@@ -43,11 +45,11 @@ namespace Assets.Scripts.Networking.Modules
         protected virtual void OnMessage(Message<T> message) { }
 
         internal void SendMessage(T data) {
-            packer.Pack(new Message<T>()
+            sender.SendMessage(packer.Pack(new Message<T>()
             {
                 cmd = 0,
                 data = data
-            });
+            }));
         }
 
         internal void SendMessage(T data, MessageCallback callback)
@@ -58,12 +60,18 @@ namespace Assets.Scripts.Networking.Modules
                 callbacks[packageId](false, null);
             }
             callbacks.Add(packageId, callback);
-            SendMessage(data);
+
+            sender.SendMessage(packer.Pack(new Message<T>()
+            {
+                id = packageId,
+                cmd = 0,
+                data = data
+            }));
         }
     }
 
     abstract class TcpModule : TcpModule<Dictionary<string, object>>
     {
-        public TcpModule(TcpListener listener) : base(listener) { }
+        public TcpModule(TcpListener listener, TcpSender sender) : base(listener, sender) { }
     }
 }

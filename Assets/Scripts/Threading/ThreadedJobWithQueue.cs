@@ -7,7 +7,7 @@ namespace Assets.Scripts.Threading
     {
         private Queue<byte[]> m_Queue = new Queue<byte[]>();
         private bool m_IsCanceled = false;
-        private bool HasUpdate
+        protected bool HasMessage
         {
             get
             {
@@ -21,7 +21,7 @@ namespace Assets.Scripts.Threading
         }
         protected byte[] Message
         {
-            private get
+            get
             {
                 byte[] tmp;
                 lock (m_Handle)
@@ -64,14 +64,13 @@ namespace Assets.Scripts.Threading
             }
         }
 
-        protected abstract void ThreadedFunction();
-
-        protected override void ThreadFunction()
+        public override bool Update()
         {
-            while(!IsCancled)
-            {
-                ThreadedFunction();
-            }
+            if (IsCancled) return base.Update();
+            if (!IsDone || !HasMessage) return false;
+            IsDone = false;
+            Start();
+            return false;
         }
     }
 }

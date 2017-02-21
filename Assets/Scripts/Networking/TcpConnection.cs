@@ -9,6 +9,7 @@ public class TcpConnection : MonoBehaviour {
 
     private TcpClient client;
     private SslStream stream;
+    private TcpSender sender;
 
     internal void StartClient(string address, int port)
     {
@@ -23,6 +24,13 @@ public class TcpConnection : MonoBehaviour {
         this.client = client;
         this.stream = stream;
         StartListening();
+        PrepareSending();
+    }
+
+    internal void PrepareSending()
+    {
+        sender = new TcpSender(stream);
+        StartCoroutine(sender.WaitFor());
     }
 
     internal void StartListening()

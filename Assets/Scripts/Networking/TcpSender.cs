@@ -2,15 +2,30 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Security;
 using System.Text;
 
 namespace Assets.Scripts.Networking
 {
     class TcpSender : ThreadedJobWithQueue
     {
-        protected override void ThreadedFunction()
+        SslStream stream;
+        public TcpSender(SslStream stream)
         {
-            throw new NotImplementedException();
+            this.stream = stream;
+        }
+
+        internal void SendMessage(byte[] data)
+        {
+            Message = data;
+        }
+
+        protected override void ThreadFunction()
+        {
+            while (HasMessage)
+            {
+                stream.Write(Message);
+            }
         }
 
         protected override void OnFinished()
