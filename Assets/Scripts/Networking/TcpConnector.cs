@@ -18,13 +18,22 @@ namespace Assets.Scripts.Networking
         private TcpClient client;
         internal SslStream stream;
 
+        string url;
+        int port;
+
+        internal TcpConnector(string url, int port)
+        {
+            this.url = url;
+            this.port = port;
+        }
+
         protected override void ThreadFunction()
         {
             if (client != null && stream != null) return;
-            client = new TcpClient("192.168.178.5", 3000);
+            client = new TcpClient(url, port);
             stream = new SslStream(client.GetStream(), false,
                 new RemoteCertificateValidationCallback((s, c, chain, ssl) => true), null);
-            stream.AuthenticateAsClient("192.168.178.5");
+            stream.AuthenticateAsClient(url);
         }
 
         protected override void OnFinished()

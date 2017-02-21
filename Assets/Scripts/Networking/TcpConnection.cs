@@ -12,7 +12,7 @@ public class TcpConnection : MonoBehaviour {
 
     internal void StartClient(string address, int port)
     {
-        var connector = new TcpConnector();
+        var connector = new TcpConnector(address, port);
         connector.OnConnected += Connector_OnConnected;
         connector.Connect();
         StartCoroutine(connector.WaitFor());
