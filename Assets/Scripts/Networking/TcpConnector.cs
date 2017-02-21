@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Assets.Scripts.Threading;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -11,11 +12,11 @@ namespace Assets.Scripts.Networking
 {
     class TcpConnector : ThreadedJob
     {
-        public delegate void TcpEvent(object sender, object data);
-        public event TcpEvent OnConnected;
+        public delegate void TcpConnected(TcpClient client, SslStream stream);
+        public event TcpConnected OnConnected;
 
         private TcpClient client;
-        private SslStream stream;
+        internal SslStream stream;
 
         protected override void ThreadFunction()
         {
@@ -28,7 +29,7 @@ namespace Assets.Scripts.Networking
 
         protected override void OnFinished()
         {
-            OnConnected(this, "Connected to " + client.Client.RemoteEndPoint);
+            OnConnected(client, stream);
         }
 
         public void Connect()

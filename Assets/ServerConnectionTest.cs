@@ -1,5 +1,4 @@
-﻿using Assets.Scripts.Networking;
-using System.Collections;
+﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -10,6 +9,7 @@ public class ServerConnectionTest : MonoBehaviour
     public Text log;
     public Text messageCount;
     public InputField serverUrl;
+    public InputField serverPort;
     public Toggle stepByStep;
     private Queue<string> messages = new Queue<string>();
 
@@ -18,6 +18,7 @@ public class ServerConnectionTest : MonoBehaviour
     {
         log.text = "Ready...";
         serverUrl.text = Environment.ENV.API_PATH;
+        serverPort.text = Environment.ENV.API_PORT.ToString();
     }
 
     private void Update()
@@ -27,10 +28,8 @@ public class ServerConnectionTest : MonoBehaviour
 
     public void Connect()
     {
-        var connector = new TcpConnector();
-        connector.OnConnected += Connector_OnConnected;
-        connector.Connect();
-        StartCoroutine(connector.WaitFor());
+        var connector = GetComponent<TcpConnection>();
+        connector.StartClient(serverUrl.text, Convert.ToInt32(serverPort.text));
         //ServerConnection.OpenSocket(serverUrl.text);
     }
 
