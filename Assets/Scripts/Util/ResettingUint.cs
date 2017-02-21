@@ -5,18 +5,19 @@ using System.Text;
 
 namespace Assets.Scripts.Util
 {
-    class ResettingUint
+    class CyclingByte
     {
-        ushort c = default(ushort);
+        byte c = default(byte);
 
-        public ushort GetNext()
+        public byte GetNext()
         {
-            if (c < ushort.MaxValue)
+            if (c < byte.MaxValue)
             {
                 c++;
-            } else
+            }
+            else
             {
-                c = ushort.MinValue;
+                c = byte.MinValue;
             }
 
             return c;

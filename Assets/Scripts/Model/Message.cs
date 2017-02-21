@@ -8,13 +8,15 @@ using UnityEngine;
 
 namespace Assets.Scripts.Model
 {
-    [Serializable]
-    class Message
+    class Message<T> where T : class, new()
     {
         public int? id { get; set; }
         public int cmd { get; set; }
-        public Dictionary<string, object> data { get; set; }
+        public T data { get; set; }
     }
+
+    [Serializable]
+    sealed class Message : Message<Dictionary<string, object>> { }
 
     class MessageSerializer
     {
@@ -42,7 +44,7 @@ namespace Assets.Scripts.Model
     }
 
     internal class Welcome
-    {
+    { 
         public string message { get; set; }
     }
 }
