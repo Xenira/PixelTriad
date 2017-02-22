@@ -8,6 +8,8 @@ namespace Assets.Scripts.Networking.Modules.Login
 {
     class LoginModule : TcpModule<LoginModule, LoginRequest, User>
     {
+        public LoginModule() : base() { cmd = 1; }
+
         internal User user { get; private set; }
         internal void Login(string username, string password, MessageCallback callback)
         {
@@ -15,9 +17,9 @@ namespace Assets.Scripts.Networking.Modules.Login
                 {
                     un = username,
                     pw = password
-                }, (success, msg) =>
+                }, (error, msg) =>
                 {
-                    if (!success)
+                    if (error != null)
                     {
                         user = null;
                     }
@@ -26,7 +28,7 @@ namespace Assets.Scripts.Networking.Modules.Login
                         user = msg.data;
                     }
 
-                    callback(success, msg);
+                    callback(error, msg);
                 }
             );
         }

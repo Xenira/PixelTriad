@@ -17,12 +17,12 @@ public class LoginForm : MonoBehaviour
     public void Login()
     {
         btnLogin.enabled = false;
-        LoginModule.Instance.Login(tbEmail.text, tbPassword.text, (success, user) =>
+        LoginModule.Instance.Login(tbEmail.text, tbPassword.text, (error, user) =>
         {
             btnLogin.enabled = true;
-            if (!success)
+            if (error != null)
             {
-                lblError.text = "Could not log in with given credentials";
+                lblError.text = error.data.message;
                 return;
             }
 

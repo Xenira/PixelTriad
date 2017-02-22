@@ -1,10 +1,8 @@
 ﻿using Assets.Scripts.Model;
 using Assets.Scripts.Util;
 using MiniMessagePack;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using System;
 
 namespace Assets.Scripts.Networking.Modules
 {
@@ -18,8 +16,9 @@ namespace Assets.Scripts.Networking.Modules
 
         private Dictionary<byte, MessageCallback> callbacks = new Dictionary<byte, MessageCallback>();
         private TcpSender sender;
+        protected ushort cmd;
 
-        internal delegate void MessageCallback(bool success, Message<Out> data);
+        internal delegate void MessageCallback(Message<Error> error, Message<Out> data);
 
         private static Base _instance;
         internal static Base Instance
@@ -34,7 +33,7 @@ namespace Assets.Scripts.Networking.Modules
             }
         }
 
-        public TcpModule()
+        protected TcpModule()
         {
             sender = TcpConnection.sender;
             TcpConnection.listener.OnMessageRecived += Listener_OnMessageRecived;
@@ -42,34 +41,44 @@ namespace Assets.Scripts.Networking.Modules
 
         private void Listener_OnMessageRecived(Message message)
         {
-            if (typeof(In) is IDictionary<string, object>)
+            if (message.cmd == 0 && message.id.HasValue && callbacks.ContainsKey(message.id.Value))
             {
-                OnMessage(message as Message<Out>);
-                return;
+                callbacks[message.id.Value](ParseMessage<Error>(message), null);
+                callbacks.Remove(message.id.Value);
+            }
+            if (message.cmd != cmd) { return; }
+
+            OnMessage(ParseMessage<Out>(message));
+        }
+
+        private Message<T> ParseMessage<T>(Message message) where T : class, new()
+        {
+            if (typeof(T) is IDictionary<string, object>)
+            {
+                return message as Message<T>;
             }
 
-            var parsedMessage = new Message<Out>
+            return new Message<T>
             {
                 id = message.id,
                 cmd = message.cmd,
-                data = message.data.ToObject<Out>()
+                data = message.data.ToObject<T>()
             };
-
-            OnMessage(parsedMessage);
         }
 
         protected virtual void OnMessage(Message<Out> message)
         {
             if (message.id.HasValue && callbacks.ContainsKey(message.id.Value))
             {
-                callbacks[message.id.Value](true, message);
+                callbacks[message.id.Value](null, message);
+                callbacks.Remove(message.id.Value);
             }
         }
 
         internal void SendMessage(In data) {
             sender.SendMessage(packer.Pack(DictionarySerializer.AsDictionary(new Message<In>()
             {
-                cmd = 0,
+                cmd = cmd,
                 data = data
             })));
         }
@@ -79,14 +88,15 @@ namespace Assets.Scripts.Networking.Modules
             var packageId = id.GetNext();
             if (callbacks.ContainsKey(packageId))
             {
-                callbacks[packageId](false, null);
+                callbacks[packageId](ParseMessage<Error>(MessageSerializer.createErrorMessage("Message timed out", packageId)), null);
+                callbacks.Remove(packageId);
             }
             callbacks.Add(packageId, callback);
 
             sender.SendMessage(packer.Pack(DictionarySerializer.AsDictionary(new Message<In>()
             {
                 id = packageId,
-                cmd = 0,
+                cmd = cmd,
                 data = data
             })));
         }

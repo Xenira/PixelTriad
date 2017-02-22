@@ -36,9 +36,9 @@ public class ServerConnectionTest : MonoBehaviour
 
     public void Login()
     {
-        LoginModule.Instance.Login("lasse.sprengel@gmail.com", "abcdef", (success, user) =>
+        LoginModule.Instance.Login("lasse.sprengel@gmail.com", "abcdef", (error, user) =>
         {
-            Log(success ? null : "failed to authenticate", JsonUtility.ToJson(user));
+            Log(error == null ? null : error.data.message, JsonUtility.ToJson(user));
         });
     }
 

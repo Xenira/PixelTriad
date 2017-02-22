@@ -24,8 +24,8 @@ namespace Assets.Scripts.Model
         public static Message Serialize(Dictionary<string, object> data)
         {
             Debug.Log(JsonUtility.ToJson(data));
-            if (!data.ContainsKey("cmd") || !(data["cmd"] is long)) { return null; }
-            if (!data.ContainsKey("data") || !(data["data"] is Dictionary<string, object>)) { return null; } // TODO: Catch errors here instead of discarding msg
+            if (!data.ContainsKey("cmd") || !(data["cmd"] is long)) { return createErrorMessage("Cmd currupted or missing", data); }
+            if (!data.ContainsKey("data") || !(data["data"] is Dictionary<string, object>)) { return createErrorMessage("Data currupted or missing", data); }
 
             var id = data.ContainsKey("id") && data["id"] is long ? Convert.ToByte(data["id"]) : (byte?)null;
             var cmd = Convert.ToInt32(data["cmd"]);
@@ -39,6 +39,21 @@ namespace Assets.Scripts.Model
             };
         }
 
+        internal static Message createErrorMessage(string error, byte? id = null)
+        {
+            return new Message()
+            {
+                id = id,
+                cmd = 0,
+                data = new Dictionary<string, object>() { { "message", error } }
+            };
+        }
+
+        internal static Message createErrorMessage(string error, Dictionary<string, object> data)
+        {
+            return createErrorMessage(error, data.ContainsKey("id") && data["id"] is long ? Convert.ToByte(data["id"]) : (byte?)null);
+        }
+
         private static Type GetTypeFromId(int? id)
         {
             throw new NotImplementedException();
@@ -46,7 +61,7 @@ namespace Assets.Scripts.Model
     }
 
     internal class Welcome
-    { 
+    {
         public string message { get; set; }
     }
 }
