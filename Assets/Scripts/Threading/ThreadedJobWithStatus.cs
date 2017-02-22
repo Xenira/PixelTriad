@@ -30,9 +30,12 @@ namespace Assets.Scripts.Threading
                 {
                     if (!m_Status.Any())
                     {
-                        return null; // Should not happen
+                        tmp = null; // Should not happen
+                    } else
+                    {
+                        tmp = m_Status.Dequeue();
                     }
-                    tmp = m_Status.Dequeue();
+                    
                 }
                 return tmp;
             }

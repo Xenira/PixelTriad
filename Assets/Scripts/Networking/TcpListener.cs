@@ -32,10 +32,10 @@ namespace Assets.Scripts.Networking
         protected override void ThreadFunction()
         {
             var mini = new MiniMessagePacker();
-            var unpacker = Unpacker.Create(stream);
             object message;
 
-            while((message = mini.Unpack(stream)) != null && message is Dictionary<string, object>) {
+            while((message = mini.Unpack(stream)) != null) {
+                if (! (message is Dictionary<string, object>)) { continue; }
                 Status = MessageSerializer.Serialize((Dictionary<string, object>)message);
             }
         }

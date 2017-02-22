@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Assets.Scripts.Networking.Modules.Login;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
@@ -16,6 +17,17 @@ public class LoginForm : MonoBehaviour
     public void Login()
     {
         btnLogin.enabled = false;
+        LoginModule.Instance.Login(tbEmail.text, tbPassword.text, (success, user) =>
+        {
+            btnLogin.enabled = true;
+            if (!success)
+            {
+                lblError.text = "Could not log in with given credentials";
+                return;
+            }
+
+            FindObjectOfType<LevelManager>().LoadLevel("Start");
+        });
         //ServerConnection.Login(this, tbEmail.text, tbPassword.text, (error, session) =>
         //{
         //    btnLogin.enabled = true;

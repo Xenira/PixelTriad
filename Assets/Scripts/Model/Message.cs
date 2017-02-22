@@ -23,10 +23,11 @@ namespace Assets.Scripts.Model
     {
         public static Message Serialize(Dictionary<string, object> data)
         {
-            Debug.Log(data["cmd"].GetType().ToString());
-            if (!data.ContainsKey("cmd") || !(data["cmd"] is long) || !data.ContainsKey("data")) { return null; }
+            Debug.Log(JsonUtility.ToJson(data));
+            if (!data.ContainsKey("cmd") || !(data["cmd"] is long)) { return null; }
+            if (!data.ContainsKey("data") || !(data["data"] is Dictionary<string, object>)) { return null; } // TODO: Catch errors here instead of discarding msg
 
-            var id = data.ContainsKey("id") && data["id"] is byte ? (byte)data["id"] : (byte?)null;
+            var id = data.ContainsKey("id") && data["id"] is long ? Convert.ToByte(data["id"]) : (byte?)null;
             var cmd = Convert.ToInt32(data["cmd"]);
             var d = (Dictionary<string, object>)data["data"];
 

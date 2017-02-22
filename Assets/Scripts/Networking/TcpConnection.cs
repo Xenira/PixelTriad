@@ -12,6 +12,24 @@ public class TcpConnection : MonoBehaviour {
     internal static Assets.Scripts.Networking.TcpListener listener;
     internal static TcpSender sender;
 
+    internal static bool IsInitialized
+    {
+        get { return client != null && stream != null; }
+    }
+
+    internal static bool IsListening
+    {
+        get { return IsInitialized && listener != null && sender != null; }
+    }
+
+    private void Start()
+    {
+        if (!IsListening)
+        {
+            StartClient(Environment.ENV.API_PATH, Environment.ENV.API_PORT);
+        }
+    }
+
     internal void StartClient(string address, int port)
     {
         var connector = new TcpConnector(address, port);

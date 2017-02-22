@@ -8,13 +8,27 @@ namespace Assets.Scripts.Networking.Modules.Login
 {
     class LoginModule : TcpModule<LoginModule, LoginRequest, User>
     {
+        internal User user { get; private set; }
         internal void Login(string username, string password, MessageCallback callback)
         {
             SendMessage(new LoginRequest()
-            {
-                un = username,
-                pw = password
-            }, callback);
+                {
+                    un = username,
+                    pw = password
+                }, (success, msg) =>
+                {
+                    if (!success)
+                    {
+                        user = null;
+                    }
+                    else
+                    {
+                        user = msg.data;
+                    }
+
+                    callback(success, msg);
+                }
+            );
         }
     }
 }
