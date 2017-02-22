@@ -23,7 +23,6 @@ namespace Assets.Scripts.Model
     {
         public static Message Serialize(Dictionary<string, object> data)
         {
-            Debug.Log(JsonUtility.ToJson(data));
             if (!data.ContainsKey("cmd") || !(data["cmd"] is long)) { return createErrorMessage("Cmd currupted or missing", data); }
             if (!data.ContainsKey("data") || !(data["data"] is Dictionary<string, object>)) { return createErrorMessage("Data currupted or missing", data); }
 

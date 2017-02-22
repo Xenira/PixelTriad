@@ -1,13 +1,15 @@
-﻿using System;
+﻿using Assets.Scripts.Util;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
 namespace Assets.Scripts.Model
 {
-    [Serializable]
+    [Serialize]
     public class Deck
     {
-        public List<Card> cards = new List<Card>();
+        public string name { get; set; }
+        public Card[] cards { get; set; }
     }
 }
