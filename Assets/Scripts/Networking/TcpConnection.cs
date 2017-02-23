@@ -63,8 +63,6 @@ public class TcpConnection : MonoBehaviour {
 
     private void Listener_OnMessageRecived(Message message)
     {
-        Debug.Log(message.cmd);
-        Debug.Log(message.data);
     }
 
     internal bool IsConnected()

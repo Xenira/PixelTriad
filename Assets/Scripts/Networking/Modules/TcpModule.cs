@@ -58,11 +58,20 @@ namespace Assets.Scripts.Networking.Modules
                 return message as Message<T>;
             }
 
+            T data = null;
+            try
+            {
+                data = message.data.ToObject<T>();
+            }
+            catch (Exception e)
+            {
+            }
+
             return new Message<T>
             {
                 id = message.id,
                 cmd = message.cmd,
-                data = message.data.ToObject<T>()
+                data = data
             };
         }
 
@@ -75,7 +84,8 @@ namespace Assets.Scripts.Networking.Modules
             }
         }
 
-        internal void SendMessage(In data) {
+        internal void SendMessage(In data)
+        {
             sender.SendMessage(packer.Pack(DictionarySerializer.AsDictionary(new Message<In>()
             {
                 cmd = cmd,
@@ -104,8 +114,10 @@ namespace Assets.Scripts.Networking.Modules
 
     abstract class TcpModule<Base, In> : TcpModule<Base, In, Dictionary<string, object>>
         where In : class, new()
-        where Base : TcpModule<Base, In, Dictionary<string, object>>, new() { }
+        where Base : TcpModule<Base, In, Dictionary<string, object>>, new()
+    { }
 
     abstract class TcpModule<Base> : TcpModule<Base, Dictionary<string, object>, Dictionary<string, object>>
-        where Base : TcpModule<Base, Dictionary<string, object>, Dictionary<string, object>>, new() { }
+        where Base : TcpModule<Base, Dictionary<string, object>, Dictionary<string, object>>, new()
+    { }
 }
