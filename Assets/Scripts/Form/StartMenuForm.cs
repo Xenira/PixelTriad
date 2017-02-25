@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using Assets.Scripts.Networking.Modules.Login;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -9,11 +10,12 @@ public class StartMenuForm : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-        //if (ServerConnection.session == null)
-        //{
-        //    FindObjectOfType<LevelManager>().LoadLevel("Login");
-        //    return;
-        //}
-        //usernameLabel.text = ServerConnection.session.user.name;
-	}
+        var u = LoginModule.Instance.user;
+        if (u == null)
+        {
+            FindObjectOfType<LevelManager>().LoadLevel("Login");
+            return;
+        }
+        usernameLabel.text = u.name;
+    }
 }
